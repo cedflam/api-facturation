@@ -49,6 +49,16 @@ class Invoice
      */
     private $advances;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $remaining;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Estimate::class, cascade={"persist", "remove"})
+     */
+    private $estimate;
+
     public function __construct()
     {
         $this->advances = new ArrayCollection();
@@ -146,6 +156,30 @@ class Invoice
                 $advance->setInvoice(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRemaining(): ?float
+    {
+        return $this->remaining;
+    }
+
+    public function setRemaining(?float $remaining): self
+    {
+        $this->remaining = $remaining;
+
+        return $this;
+    }
+
+    public function getEstimate(): ?Estimate
+    {
+        return $this->estimate;
+    }
+
+    public function setEstimate(?Estimate $estimate): self
+    {
+        $this->estimate = $estimate;
 
         return $this;
     }
