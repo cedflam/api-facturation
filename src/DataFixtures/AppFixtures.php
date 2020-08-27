@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Customer;
+use App\Entity\Estimate;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -58,6 +59,17 @@ class AppFixtures extends Fixture
                          ->setUser($user)
                 ;
                 $manager->persist($customer);
+
+                for ($k = 0; $k < 3; $k++){
+                    $estimate = new Estimate();
+                    $estimate->setUser($user)
+                             ->setCreatedAt($faker->dateTimeBetween('-30 days', 'now'))
+                             ->setCustomer($customer)
+                             ->setHtAmount(mt_rand(200, 1500))
+                             ->setTtcAmount(($estimate->getHtAmount() * 19.6)/100 + $estimate->getHtAmount())
+                    ;
+                    $manager->persist($estimate);
+                }
             }
         }
 

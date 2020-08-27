@@ -2,13 +2,25 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
+ * @ApiResource(
+ *     attributes={
+ *          "pagination_enabled"=true,
+ *          "order":{"createdAt":"desc"}
+ *     },
+ *     normalizationContext={"invoices_read"}
+ * )
+ * @ApiFilter(OrderFilter::class, properties={"ttcAmount", "createdAt"})
  */
 class Invoice
 {
@@ -16,48 +28,58 @@ class Invoice
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $totalAdvance;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $htAmount;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $ttcAmount;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="invoices")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $user;
 
     /**
      * @ORM\OneToMany(targetEntity=Advance::class, mappedBy="invoice")
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $advances;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"invoices_read", "customers_read"})
      */
     private $remaining;
 
     /**
-     * @ORM\OneToOne(targetEntity=Estimate::class, cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Estimate::class, inversedBy="invoices")
      */
     private $estimate;
+
+
 
     public function __construct()
     {
@@ -183,4 +205,8 @@ class Invoice
 
         return $this;
     }
+
+
+
+
 }

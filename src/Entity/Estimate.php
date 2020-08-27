@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\EstimateRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=EstimateRepository::class)
+ * @ApiResource()
  */
 class Estimate
 {
@@ -49,9 +51,15 @@ class Estimate
      */
     private $descriptions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="estimate")
+     */
+    private $invoices;
+
     public function __construct()
     {
         $this->descriptions = new ArrayCollection();
+        $this->invoices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -144,6 +152,37 @@ class Estimate
             // set the owning side to null (unless already changed)
             if ($description->getEstimate() === $this) {
                 $description->setEstimate(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Invoice[]
+     */
+    public function getInvoices(): Collection
+    {
+        return $this->invoices;
+    }
+
+    public function addInvoice(Invoice $invoice): self
+    {
+        if (!$this->invoices->contains($invoice)) {
+            $this->invoices[] = $invoice;
+            $invoice->setEstimate($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoice(Invoice $invoice): self
+    {
+        if ($this->invoices->contains($invoice)) {
+            $this->invoices->removeElement($invoice);
+            // set the owning side to null (unless already changed)
+            if ($invoice->getEstimate() === $this) {
+                $invoice->setEstimate(null);
             }
         }
 
