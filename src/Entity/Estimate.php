@@ -7,10 +7,13 @@ use App\Repository\EstimateRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=EstimateRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     denormalizationContext={"disabled_type_enforcement"=true}
+ * )
  */
 class Estimate
 {
@@ -23,26 +26,33 @@ class Estimate
 
     /**
      * @ORM\Column(type="date")
+     * @Assert\NotBlank(message="La date de facture est obligatoire")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Le montant hors taxes est obligatoire")
+     * @Assert\Type(type="numeric", message="Le montant ht doit être au format numérique")
      */
     private $htAmount;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Le montant ttc est obligatoire")
+     * @Assert\Type(type="numeric", message="Le montant ht doit être au format numérique")
      */
     private $ttcAmount;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="estimates")
+     * @Assert\NotBlank(message="Le devis doit être lié à un utilisateur")
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="estimates")
+     * @Assert\NotBlank(message="Le devis doit être lié à un client")
      */
     private $customer;
 

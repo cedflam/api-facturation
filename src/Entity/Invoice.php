@@ -10,15 +10,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=InvoiceRepository::class)
+ *
+ * *****dénormalizationContext permet de désactiver la vérificaton symfony sur les float
+ * *****et permet donc de mettre en avant l'assert type numeric
  * @ApiResource(
  *     attributes={
- *          "pagination_enabled"=true,
  *          "order":{"createdAt":"desc"}
  *     },
- *     normalizationContext={"invoices_read"}
+ *     denormalizationContext={"disabled_type_enforcement"=true}
  * )
  * @ApiFilter(OrderFilter::class, properties={"ttcAmount", "createdAt"})
  */
@@ -28,54 +31,59 @@ class Invoice
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"invoices_read", "customers_read"})
+     *
      */
     private $id;
 
     /**
      * @ORM\Column(type="date")
-     * @Groups({"invoices_read", "customers_read"})
+     * @Assert\NotBlank(message="La date de facture est obligatoire ")
+     *
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"invoices_read", "customers_read"})
+     *
+     *
      */
     private $totalAdvance;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"invoices_read", "customers_read"})
+     * @Assert\NotBlank(message="Le montant ht est obligatoire ")
+     * @Assert\Type(type="numeric", message="Le montant ht doit être au format numérique")
      */
     private $htAmount;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"invoices_read", "customers_read"})
+     * @Assert\NotBlank(message="Le montant ttc est obligatoire ")
+     * @Assert\Type(type="numeric", message="Le montant ht doit être au format numérique")
      */
     private $ttcAmount;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="invoices")
-     * @Groups({"invoices_read", "customers_read"})
+     * @Assert\NotBlank(message="La facture doit être liée à un utilisateur")
      */
     private $user;
 
     /**
      * @ORM\OneToMany(targetEntity=Advance::class, mappedBy="invoice")
-     * @Groups({"invoices_read", "customers_read"})
+     *
      */
     private $advances;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"invoices_read", "customers_read"})
+     *
      */
     private $remaining;
 
     /**
      * @ORM\ManyToOne(targetEntity=Estimate::class, inversedBy="invoices")
+     * @Assert\NotBlank(message="La facture doit être liée à un devis")
      */
     private $estimate;
 

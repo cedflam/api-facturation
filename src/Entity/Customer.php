@@ -11,15 +11,14 @@ use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
- * @ApiResource(
- *     normalizationContext={
- *          "groups"={"customers_read"},
- *     }
- * )
+ * @UniqueEntity("email", message="Cette adresse email existe déjà")
+ * @ApiResource()
  * @ApiFilter(SearchFilter::class, properties={"firstName":"partial", "lastName":"partial"})
  * @ApiFilter(OrderFilter::class)
  */
@@ -29,62 +28,76 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read" })
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(
+     *     min="3",
+     *     minMessage="Le prénom doit faire au moins 3 caractères",
+     *     max="255",
+     *     maxMessage="Le prénom doit faire moins de 255 caractères"
+     * )
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(
+     *     min="3",
+     *     minMessage="Le nom doit faire au moins 3 caractères",
+     *     max="255",
+     *     maxMessage="Le nom doit faire moins de 255 caractères"
+     * )
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $postalCode;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="L'email est obligatoire")
+     * @Assert\Email(message="Le format de l'adresse est invalide")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $tel;
 
     /**
      * @ORM\OneToMany(targetEntity=Estimate::class, mappedBy="customer")
-     * @Groups({"customers_read", "invoices_read"})
-     * @ApiSubresource()
+     *
+     *
      */
     private $estimates;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
      * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="L'utilisateur doit être lié au nouveau Customer")
      */
     private $user;
 

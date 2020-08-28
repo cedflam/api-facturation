@@ -5,10 +5,13 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DescriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DescriptionRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     denormalizationContext={"disabled_type_enforcement"=true}
+ * )
  */
 class Description
 {
@@ -21,36 +24,47 @@ class Description
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="L'intitulé est obligatoire")
      */
     private $delivery;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="La quantité est obligatoire")
+     * @Assert\Type(type="numeric", message="La quantité doit être au format numérique")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="l'unité de mesure est obligatoire")
      */
     private $unit;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Le prix unitaire est obligatoire")
+     * @Assert\Type(type="numeric", message="Le prix unitaire doit être au format numérique")
      */
     private $unitPrice;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Le montant ht est obligatoire")
+     * @Assert\Type(type="numeric", message="Le montant ht doit être au format numérique")
      */
     private $htAmount;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(message="Le montant ttc est obligatoire")
+     * @Assert\Type(type="numeric", message="Le montant ttc doit être au format numérique")
      */
     private $ttcAmount;
 
     /**
      * @ORM\ManyToOne(targetEntity=Estimate::class, inversedBy="descriptions")
+     * @Assert\NotBlank(message="La description doit être liée à un devis")
      */
     private $estimate;
 

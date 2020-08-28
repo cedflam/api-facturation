@@ -10,10 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=AdvanceRepository::class)
- * @ApiResource(
- *     itemOperations={"get", "delete", "put"},
- *     normalizationContext={"advance_read"}
- * )
+ * @ApiResource()
  */
 class Advance
 {
@@ -26,7 +23,7 @@ class Advance
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"advance_read"})
+     *
      */
     private $amount;
 
